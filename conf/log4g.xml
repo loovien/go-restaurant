@@ -1,0 +1,10 @@
+<!-- seelog configuration file -->
+<seelog minlevel="debug" maxlevel="error">
+    <outputs>
+        <console formatid="a"/>
+        <!--<rollingfile type="size" filename="./logs/roll.log" maxsize="1000" maxrolls="5" />-->
+    </outputs>
+    <formats>
+        <format id="a" format="[%Date][%Lev] %Func: %Msg%n" />
+    </formats>
+</seelog>
