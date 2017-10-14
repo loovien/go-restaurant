@@ -1,13 +1,11 @@
 package main
 
 import (
-	log "github.com/cihub/seelog"
 	"testing"
+	log "github.com/cihub/seelog"
 )
 
 func TestLog(t *testing.T)  {
-	InitLog("conf/log4g.xml")
-	log.Info("hello")
-	log.Debug("wold")
-	t.Log("------------")
+	InitLog("")
+	log.Debug("-------------")
 }

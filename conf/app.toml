@@ -1,2 +1,5 @@
-name = "chinese restaurant"
+name = "restaurant"
 version = "1.0"
+
+# server listen address
+addr = "0.0.0.0:2000"

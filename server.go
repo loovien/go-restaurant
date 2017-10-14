@@ -6,20 +6,45 @@ import (
 	"fmt"
 	"os"
 	log "github.com/cihub/seelog"
+	"github.com/vvotm/gotcp"
+	"flag"
+	"net"
+	"time"
 )
 
+var listenAddr *string = flag.String("addr", "", "address of listen")
 func main() {
 	Bootstrap()
-
-	log.Debug("ooooooooooooooooooooooooooooooooo")
-
+	log.Info("*********Server Start**********")
+	tcpconf := &gotcp.Config{
+		PacketSendChanLimit: 10, // the limit of packet send channel
+		PacketReceiveChanLimit: 10, // the limit of packet receive channel
+	}
+	if *listenAddr == "" { // if command line not pass address use config file
+		conf, _ := GetConf()
+		listenAddr = &conf.Addr
+	}
+	log.Infof("Listen at: %s", *listenAddr)
+	srv := gotcp.NewServer(tcpconf, &Callback{}, &DinnerProtocol{})
+	tcpAddr, _ := net.ResolveTCPAddr("tcp", *listenAddr)
+	tcpListenAddr, err := net.ListenTCP("tcp", tcpAddr)
+	defer tcpListenAddr.Close()
+	if err != nil {
+		log.Errorf("Listen: %v", err)
+		os.Exit(1)
+	}
+	srv.Start(tcpListenAddr, time.Second * 10)
 	signalChan := make(chan os.Signal)
 	signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM, syscall.SIGKILL)
 
+	log.Info("********Started OK********")
 	fmt.Println("System Signal:", <-signalChan)
+	srv.Stop()
 }
 
 func Bootstrap()  {
 	InitLog("conf/log4g.xml")
+
 	InitConf("conf/app.toml")
+	flag.Parse()
 }

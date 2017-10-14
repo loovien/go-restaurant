@@ -14,6 +14,7 @@ var (
 type Conf struct{
 	Name string
 	Version string
+	Addr string
 }
 
 // NewConf
