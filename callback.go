@@ -52,4 +52,27 @@ func (callback *Callback) OnMessage(conn *gotcp.Conn, packet gotcp.Packet) bool 
 // OnClose when establish connection close this method will be invoke
 func (callback *Callback) OnClose(conn *gotcp.Conn) {
 	log.Infof("%v Closed!", conn.GetExtraData())
+	brain, _ := GetRTBrain()
+	remoteAddr := conn.GetRawConn().RemoteAddr().String()
+	tableNo, ok := brain.TableNoConn[remoteAddr]
+	if !ok {
+		return
+	}
+	tableInfo, ok := brain.TableConn[tableNo]
+	if !ok {
+		return
+	}
+	for index, item := range tableInfo.People {
+		if item.GetRawConn().RemoteAddr().String() == remoteAddr {
+			log.Infof("Delete Conn: %s People: %d", remoteAddr, len(tableInfo.People))
+			if len(tableInfo.People) == 1 {
+				tableInfo.People = []*gotcp.Conn{}
+			} else {
+				tableInfo.People = append(tableInfo.People[:index], tableInfo.People[index+1:]...)
+			}
+			brain.TableConn[tableNo] = tableInfo
+			return
+		}
+
+	}
 }

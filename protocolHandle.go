@@ -65,8 +65,9 @@ func (protocolHandle *ProtocolHandle) SitDown(conn *gotcp.Conn, param map[string
 
 	brain, _ := GetRTBrain()
 	tableInfo, ok := brain.TableConn[tableNo]
-	if !ok {
+	if !ok || len(tableInfo.People) == 0 {
 		brain.TableConn[tableNo] = &TableInfo{TableNo:tableNo, Token:token, People: []*gotcp.Conn{conn}}
+		brain.TableNoConn[conn.GetRawConn().RemoteAddr().String()] = tableNo
 		return sendPacket(conn, 0, "瓜子, 花生先吃起来!!!") // 上花生瓜子
 	}
 	if len(tableInfo.People) >= tableNum {
@@ -76,6 +77,7 @@ func (protocolHandle *ProtocolHandle) SitDown(conn *gotcp.Conn, param map[string
 		return sendPacket(conn, 1, "你是那来的, 不是这桌的把!")
 	}
 	tableInfo.People = append(tableInfo.People, conn) // join to table
+	brain.TableNoConn[conn.GetRawConn().RemoteAddr().String()] = tableNo
 	return sendPacket(conn, 0, "欢迎您, 朋友, 等你很久了, 瓜子花生都吃完了!")
 }
 

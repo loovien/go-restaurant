@@ -25,6 +25,7 @@ type RTBrain struct {
 	waitGroup *sync.WaitGroup
 	TableConn map[string]*TableInfo
 	CloseChan chan bool
+	TableNoConn map[string]string
 }
 
 type TableInfo struct {
@@ -44,6 +45,7 @@ func InitTRBran(numCook int) *RTBrain {
 				&sync.WaitGroup{},
 				make(map[string]*TableInfo),
 				make(chan bool),
+				make(map[string]string),
 			}
 		})
 	}
@@ -72,7 +74,9 @@ func (rtBrain *RTBrain) CookWork() {
 						return
 					}
 					log.Infof("cook food: %v", order)
+					rtBrain.ServingChan <- order
 				default:
+					break
 				}
 			}
 		}()
@@ -88,16 +92,28 @@ func (rtBrain *RTBrain) RecipeServing() {
 			select {
 			case <- rtBrain.CloseChan:
 				return
-			case order := <- rtBrain.ServingChan:
+			case order, isNotClose := <- rtBrain.ServingChan:
+				if !isNotClose {
+					return
+				}
+				log.Infof("上菜: %v", order)
 				tableInfo, ok := rtBrain.TableConn[order.TableNo]
 				if !ok {
-					return
+					log.Errorf("没吃就走了? %v", tableInfo)
+					break
 				}
+				log.Infof("table Info: %v", tableInfo)
+				log.Infof("table people Info: %v", tableInfo.People)
+				log.Infof("table tableNo Info: %v", tableInfo.TableNo)
 				for _, people := range tableInfo.People { // 上菜
 					recipeByte, _ := json.Marshal(order.Food)
+					log.Infof("send data %s", string(recipeByte))
+					log.Info(people.GetExtraData())
 					sendPacket(people, 0, string(recipeByte))
-					return
 				}
+				break
+			default:
+				break
 			}
 		}
 	}()
