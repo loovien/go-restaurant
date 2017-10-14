@@ -15,6 +15,17 @@ import (
 var listenAddr *string = flag.String("addr", "", "address of listen")
 func main() {
 	Bootstrap()
+	Run()
+}
+
+func Bootstrap()  {
+	InitLog("conf/log4g.xml")
+	InitConf("conf/app.toml")
+	conf, _ := GetConf()
+	InitTRBran(conf.Restaurant.CookNum)
+}
+
+func Run()  {
 	log.Info("*********Server Start**********")
 	tcpconf := &gotcp.Config{
 		PacketSendChanLimit: 10, // the limit of packet send channel
@@ -33,18 +44,20 @@ func main() {
 		log.Errorf("Listen: %v", err)
 		os.Exit(1)
 	}
-	srv.Start(tcpListenAddr, time.Second * 10)
+	go srv.Start(tcpListenAddr, time.Second * 10)
+
+	brain, err := GetRTBrain()
+	if err != nil {
+		log.Error(err)
+		os.Exit(1)
+	}
+	brain.CookWork() // 厨师上班
+	brain.RecipeServing() // 上菜上班
+	log.Info("********Restaurant Cook Working ********")
 	signalChan := make(chan os.Signal)
 	signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM, syscall.SIGKILL)
-
-	log.Info("********Started OK********")
+	log.Info("********ALL OK********")
 	fmt.Println("System Signal:", <-signalChan)
+	brain.Stop()
 	srv.Stop()
-}
-
-func Bootstrap()  {
-	InitLog("conf/log4g.xml")
-
-	InitConf("conf/app.toml")
-	flag.Parse()
 }

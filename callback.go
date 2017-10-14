@@ -33,7 +33,7 @@ func (callback *Callback) OnMessage(conn *gotcp.Conn, packet gotcp.Packet) bool 
 		log.Errorf("反JSON数据错误: %v", err)
 		return false
 	}
-	cmdid, ok := protocolData["cmdid"]
+	cmdid, ok := protocolData["cmd"]
 	if !ok {
 		log.Errorf("不能识别的协议")
 		return false

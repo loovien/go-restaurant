@@ -1,20 +1,35 @@
 package main
 
 import (
-	"sync"
 	log "github.com/cihub/seelog"
 	"github.com/BurntSushi/toml"
 )
 
-var (
-	confLoadOnce *sync.Once = new(sync.Once)
-	confInstance *Conf
-)
+var confInstance *Conf
+
+type Recipe struct {
+	Name string `json:"name"`
+	Price float64 `json:"price"`
+	Stock int `json:"stock"`
+}
+
+type Restaurant struct {
+	OpenAt string `json:"openAt"`
+	CloseAt string `json:"closeAt"`
+	TotalSeat int `json:"totalSeat"`
+	Table2p int `json:"table2p"`
+	Table4p int `json:"table4p"`
+	Table6p int `json:"table6p"`
+	Table10p int `json:"table10p"`
+	CookNum int `json:"cookNum"`
+	Menu map[string] Recipe `json:"menu"`
+}
 
 type Conf struct{
 	Name string
 	Version string
 	Addr string
+	Restaurant Restaurant
 }
 
 // NewConf
@@ -49,7 +64,7 @@ func (conf *Conf) Load (filename string, reload bool) {
 	tmpConf := NewConf()
 	_, err = toml.DecodeFile(configFile, tmpConf)
 	if err != nil {
-		log.Criticalf("Load config file 【%s】 error !", configFile)
+		log.Criticalf("config file 【%s】 %v !", configFile, err)
 	}
 	confInstance = tmpConf
 }
