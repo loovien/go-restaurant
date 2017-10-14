@@ -1,2 +1,3 @@
-# go-restaurant
-Golang simulation real life restaurant
+# Golang 实现现实的餐馆
+## 启动服务
+
