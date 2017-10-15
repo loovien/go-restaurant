@@ -24,8 +24,6 @@ type ProtocolHandle struct {
 // ask packet information
 // {
 // 	"cmd": "emptyseat",
-//	"leader": "boos", // who pay order
-// 	"eatNum": 12, // number of eat
 //	"acceptUnion": 1 // accept eat with other at same table
 // }
 
@@ -46,11 +44,9 @@ func (protocolHandle *ProtocolHandle) EmptySeat(conn *gotcp.Conn, param map[stri
 // SitDown
 // packet information
 // {
-//	"cmd": "orderMeat",
+//	"cmd": "sitDown",
 //	"tableNo": "A01", // 桌号
 //	"token" : "token", // 座位口令, 正确口令才能坐下
-//	"num": 2, // 人数
-// 	"isCook" : "0", // 是否上菜 [0/不上, 1/上菜]
 // }
 func (protocolHandle *ProtocolHandle) SitDown(conn *gotcp.Conn, param map[string]interface{}) bool {
 	log.Infof("SitDown Handle: %v", param)
