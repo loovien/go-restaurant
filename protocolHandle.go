@@ -70,6 +70,13 @@ func (protocolHandle *ProtocolHandle) SitDown(conn *gotcp.Conn, param map[string
 		brain.TableNoConn[conn.GetRawConn().RemoteAddr().String()] = tableNo
 		return sendPacket(conn, 0, "瓜子, 花生先吃起来!!!") // 上花生瓜子
 	}
+
+	for _, item := range tableInfo.People {
+		if conn.GetRawConn().RemoteAddr().String() == item.GetRawConn().RemoteAddr().String() {
+			return sendPacket(conn, 1, "您已经就坐, 还要干嘛?") // 桌子已满
+		}
+	}
+
 	if len(tableInfo.People) >= tableNum {
 		return sendPacket(conn, 1, "桌位已经满了, 坐不下了!") // 桌子已满
 	}

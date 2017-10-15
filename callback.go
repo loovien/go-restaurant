@@ -65,11 +65,7 @@ func (callback *Callback) OnClose(conn *gotcp.Conn) {
 	for index, item := range tableInfo.People {
 		if item.GetRawConn().RemoteAddr().String() == remoteAddr {
 			log.Infof("Delete Conn: %s People: %d", remoteAddr, len(tableInfo.People))
-			if len(tableInfo.People) == 1 {
-				tableInfo.People = []*gotcp.Conn{}
-			} else {
-				tableInfo.People = append(tableInfo.People[:index], tableInfo.People[index+1:]...)
-			}
+			tableInfo.People = append(tableInfo.People[:index], tableInfo.People[index+1:]...)
 			brain.TableConn[tableNo] = tableInfo
 			return
 		}
