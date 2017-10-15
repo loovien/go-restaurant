@@ -124,6 +124,6 @@ func (rtBrain *RTBrain) Stop() {
 	close(rtBrain.OrderChan)
 	close(rtBrain.ServingChan)
 	close(rtBrain.CloseChan)
-	log.Info("Wait ALL Order Completed!")
+	log.Info("*****Gracefully Stop*****")
 	rtBrain.waitGroup.Wait()
 }
