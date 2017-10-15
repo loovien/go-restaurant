@@ -14,6 +14,7 @@
 
 - 使用已经编译好的二进制文件 `go-restaurant.exe`(windows) `go-restaurant`(unix-like)
 - 自己编译使用
+
     0. `cd /path/to/project`
     1. `godep restore`
     2. `go build`
